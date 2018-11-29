@@ -3,28 +3,7 @@ const W = 768;
 const H = 480;
 canvas.width = W;
 canvas.height = H;
-let ctx = canvas.getContext('2d');
-
-ctx.fillStyle = 'chartreuse';
-ctx.strokeStyle = 'black'
-
-// Set line width
-ctx.lineWidth = 10;
-
-// Wall
-ctx.strokeRect(75, 140, 150, 110);
-
-// Door
-ctx.fillRect(130, 190, 40, 60);
-
-// Roof
-ctx.moveTo(50, 140);
-ctx.lineTo(150, 60);
-ctx.lineTo(250, 140);
-ctx.closePath();
-ctx.stroke();
-
-var particles = [];
+let gl = canvas.getContext('webgl');
 
 var p_x = [];
 var p_y = [];
@@ -48,20 +27,28 @@ function reset_particle(i, start_frame) {
 	p_frame[i] = start_frame || (Math.random()*60)|0
 }
 
+let vPosition = gl.getAttribLocation(program, "vPosition");
+let positionBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1,1,1,1, -1,-1,-1,1]), gl.STATIC_DRAW);
+gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(vPosition);
+gl.drawArrays(gl.LINES, 0, 2);
+
+	if (false) {
+
 const PARTICLES = 100000
 for (var i = 0; i < PARTICLES; i++) {
 	reset_particle(i);
 }
-ctx.imageSmoothingEnabled = false;
-ctx.webkitImageSmoothingEnabled = false;
 var cur_frame = 0;
 var curtime = performance.now();
 var slider = document.getElementById("slider");
 var draw
 draw = function() {
 	++cur_frame;
-	ctx.clearRect(0, 0, W, H);
-	ctx.fillStyle = 'black';
+	gl.clearColor(1.0, 1.0, 1.0);
+	gl.clear(gl.COLOR_BUFFER_BIT);
 	var particles_shown = slider.value;
 	for (var i = 0; i < particles_shown; i++) {
 		if (cur_frame < p_frame[i]) { continue };
@@ -73,6 +60,8 @@ draw = function() {
 
 		if (p_y[i] > H) {
 			reset_particle(i, cur_frame);
+			oldx = p_x[i];
+			oldy = p_y[i];
 		}
 
 		p_size[i] *= 0.97;
@@ -82,19 +71,23 @@ draw = function() {
 
 		p_vy[i] += 1;
 
-		ctx.beginPath();
-		ctx.lineWidth = p_size[i];
-		//ctx.strokeStyle = 'rgb('+p_r[i]+','+p_g[i]+','+p_b[i]+')';
-		ctx.moveTo(oldx, oldy)
-		ctx.lineTo(p_x[i], p_y[i]);
-		ctx.stroke()
-		ctx.closePath();
+		gl.drawArrays(gl.LINES, 0, 2);
+		//ctx.beginPath();
+		//ctx.lineWidth = p_size[i];
+		//ctx.moveTo(oldx, oldy)
+		//ctx.lineTo(p_x[i], p_y[i]);
+		//ctx.stroke()
+		//ctx.closePath();
 
 	};
 	var now = performance.now();
-	ctx.fillText(((now - curtime)|0) + 'ms', 5, 10);
-	ctx.fillText(particles_shown + ' particles', 5, 25);
+	//ctx.fillText(((now - curtime)|0) + 'ms', 5, 10);
+	//ctx.fillText(particles_shown + ' particles', 5, 25);
 	curtime = now;
 	window.requestAnimationFrame(draw);
 }
+
 window.requestAnimationFrame(draw);
+
+
+}

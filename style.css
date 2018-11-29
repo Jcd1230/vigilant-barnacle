@@ -7,7 +7,6 @@ body {
 	width: 768px;
 	height: 480px;
 	margin: 0 auto;
-	image-rendering: optimizeSpeed;
 	display: block;
 }
 
