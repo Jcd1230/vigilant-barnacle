@@ -1,11 +1,18 @@
 body {
-    background-color: grey;
+	background-color: grey;
 }
 
 #canvas {
-    background-color: white;
-    width: 768px;
-    height: 480px;
-    margin: 0 auto;
-    display: block;
+	background-color: white;
+	width: 768px;
+	height: 480px;
+	margin: 0 auto;
+	image-rendering: optimizeSpeed;
+	display: block;
+}
+
+#slider {
+	width: 768px;
+	margin; 0 auto;
+	display: block;
 }

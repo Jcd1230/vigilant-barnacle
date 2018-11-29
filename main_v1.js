@@ -26,34 +26,25 @@ ctx.stroke();
 
 var particles = [];
 
-var p_x = [];
-var p_y = [];
-var p_r = [];
-var p_g = [];
-var p_b = [];
-var p_size = [];
-var p_vx = [];
-var p_vy = [];
-var p_frame = [];
-
-function reset_particle(i, start_frame) {
-	p_x[i] = W/2 + Math.random()*50-25,
-	p_y[i] = H,
-	p_r[i] = 255,
-	p_g[i] = 255,
-	p_b[i] = 0,
-	p_size[i] = 1,
-	p_vx[i] = Math.random()*16 - 8,
-	p_vy[i] = Math.random()*8-32,
-	p_frame[i] = start_frame || (Math.random()*60)|0
+function new_particle(start_frame) {
+	return {
+		x: W/2 + Math.random()*50-25,
+		y: H,
+		r: 255,
+		g: 255,
+		b: 0,
+		size: 1,
+		vx: Math.random()*16 - 8,
+		vy: Math.random()*8-32,
+		frame: start_frame || (Math.random()*60)|0
+	};
 }
 
 const PARTICLES = 100000
 for (var i = 0; i < PARTICLES; i++) {
-	reset_particle(i);
+	particles[i] = new_particle();
 }
 ctx.imageSmoothingEnabled = false;
-ctx.webkitImageSmoothingEnabled = false;
 var cur_frame = 0;
 var curtime = performance.now();
 var slider = document.getElementById("slider");
@@ -64,29 +55,30 @@ draw = function() {
 	ctx.fillStyle = 'black';
 	var particles_shown = slider.value;
 	for (var i = 0; i < particles_shown; i++) {
-		if (cur_frame < p_frame[i]) { continue };
+		var p = particles[i];
+		if (cur_frame < p.frame) { continue };
 
-		var oldx = p_x[i];
-		var oldy = p_y[i];
-		p_x[i] += p_vx[i];
-		p_y[i] += p_vy[i];
+		var oldx = p.x;
+		var oldy = p.y;
+		p.x += p.vx;
+		p.y += p.vy;
 
-		if (p_y[i] > H) {
-			reset_particle(i, cur_frame);
+		if (p.y > H) {
+			particles[i] = new_particle(cur_frame);
 		}
 
-		p_size[i] *= 0.97;
+		p.size *= 0.97;
 
-		p_r[i] *= 0.95;
-		p_g[i] *= 0.9;
+		p.r *= 0.95;
+		p.g *= 0.9;
 
-		p_vy[i] += 1;
+		p.vy += 1;
 
 		ctx.beginPath();
-		ctx.lineWidth = p_size[i];
-		//ctx.strokeStyle = 'rgb('+p_r[i]+','+p_g[i]+','+p_b[i]+')';
+		ctx.lineWidth = p.size;
+		ctx.strokeStyle = 'rgb('+p.r+','+p.g+','+p.b+')';
 		ctx.moveTo(oldx, oldy)
-		ctx.lineTo(p_x[i], p_y[i]);
+		ctx.lineTo(p.x, p.y);
 		ctx.stroke()
 		ctx.closePath();
 
