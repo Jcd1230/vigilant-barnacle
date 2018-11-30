@@ -17,7 +17,7 @@
 #define SCREEN_TICKS_PER_FRAME (1000 / FPS)
 #define GET_TICKS(a) (SDL_GetTicks() - (a))
 
-#define GRAVITY_PX 4
+#define GRAVITY_PY 4
 
 #define MAX_PARTICLES 100000
 
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	SDL_Renderer *sRenderer;
 	SDL_Event sEvent;
 	int quit, curr_parts;
-	unsigned int start_tick, frame_ticks;
+	unsigned int frame_ticks;
 	struct particle_t *parts;
 	unsigned char colors[4] = {255, 100, 0, 255};
 
@@ -74,9 +74,10 @@ int main(int argc, char **argv)
 		SDL_SetWindowTitle(sWindow, WINDOW_TITLE);
 		SDL_RenderSetLogicalSize(sRenderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-		start_tick = SDL_GetTicks();
 
 		while (!quit) {
+			frame_ticks = SDL_GetTicks();
+
 			while (SDL_PollEvent(&sEvent)) {
 				switch (sEvent.type) {
 				case SDL_QUIT:
@@ -90,10 +91,9 @@ int main(int argc, char **argv)
 			SDL_RenderPresent(sRenderer);
 			update_parts(parts, MAX_PARTICLES, curr_parts);
 
-			frame_ticks = GET_TICKS(start_tick);
-			if (frame_ticks < SCREEN_TICKS_PER_FRAME) {
-				SDL_Delay(SCREEN_TICKS_PER_FRAME - frame_ticks);
-			}
+			frame_ticks = SDL_GetTicks() - frame_ticks;
+			printf("\r%d ms\tparts %5d", frame_ticks, curr_parts);
+			fflush(stdout);
 		}
 
 		SDL_DestroyRenderer(sRenderer);
@@ -138,7 +138,7 @@ void update_parts(struct particle_t *parts, int total, int num)
 	for (i = 0; i < num; i++) { // handle gravity and the new position
 		parts[i].x += parts[i].vx;
 		parts[i].y += parts[i].vy;
-		parts[i].vy += GRAVITY_PX;
+		parts[i].vy += GRAVITY_PY;
 	}
 
 	// find those that need to be reinitialized in the presented range
