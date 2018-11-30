@@ -29,14 +29,14 @@
 #define ERROR_AND_DIE(str) \
 	fprintf(stderr, "%s:%d\t%s\n", __FILE__, __LINE__, (str)); exit(1);
 /* JS_RANDFUNC : get random numbers just like Javascript */
-#define JS_RANDFUNC() (((double)rand()) / ((double)RAND_MAX) * 2 - 1)
+#define JS_RANDFUNC() (((double)rand()) / ((double)RAND_MAX))
 
 struct particle_t {
 	unsigned long frame;
 	int x;
 	int y;
-	int vx;
-	int vy;
+	double vx;
+	double vy;
 };
 typedef struct particle_t part_t;
 
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 	srand(time(NULL));
 
 	make_particles(parts, MAX_PARTICLES);
-	curr_parts = 10;
+	curr_parts = MAX_PARTICLES / 2;
 	quit = 0;
 
 	if (init(&sWindow, &sRenderer)) {
@@ -202,8 +202,8 @@ void make_particle(struct particle_t *part)
 {
 	part->x = SCREEN_WIDTH / 2 + JS_RANDFUNC() * 50 - 25;
 	part->y = SCREEN_HEIGHT;
-	part->vx = JS_RANDFUNC() * 16 - 8;
-	part->vy = JS_RANDFUNC() * 8 - 32;
+	part->vx = JS_RANDFUNC() * 32 - 16;
+	part->vy = JS_RANDFUNC() * 200 - 100;
 }
 
 
