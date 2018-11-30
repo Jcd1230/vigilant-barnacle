@@ -1,9 +1,6 @@
 CC = cc
 LINKER = -lm
-FLAGS = -Wall -g3
-TARGET = aos-example
-SOURCES = $(wildcard src/*.c)
-OBJECTS = $(SOURCES:.c=.o)
+FLAGS = -Wall -DDEFAULT_MAX="(unsigned long)(1 << 24)"
 
 all: aos soa
 
@@ -13,14 +10,9 @@ aos:
 soa:
 	$(CC) $(FLAGS) -o soa-example src/soa-example.c $(LINKER)
 
-%.o: %.c
-	$(CC) -c $(FLAGS) -o $@ $<
-
-clean: clean-obj clean-bin
+clean: clean-obj
+	rm aos-example soa-example
 
 clean-obj:
 	rm -f $(OBJECTS)
-	
-clean-bin:
-	rm -f $(TARGET)
 	

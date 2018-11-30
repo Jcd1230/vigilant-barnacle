@@ -13,7 +13,9 @@
 #include <time.h>
 #include <math.h>
 
-#define TOTAL 1 << 30 /* 2^30 */
+#ifndef DEFAULT_MAX
+#define DEFAULT_MAX 1 << 24
+#endif
 
 struct quad_t {
 	float *a;
@@ -24,18 +26,16 @@ struct quad_t {
 
 int main(int argc, char **argv)
 {
-	FILE *fp;
 	int i;
 	struct quad_t quads;
 
-	fp = fopen("output_soa.txt", "w");
-	if (!fp) { perror("couldn't open file error\n"); exit(1); }
+	printf("Testing SoA with %ld elements\n", (unsigned long)DEFAULT_MAX);
 
 	/* we have to get some memory first */
-	quads.a = malloc(sizeof(float) * TOTAL);
-	quads.b = malloc(sizeof(float) * TOTAL);
-	quads.c = malloc(sizeof(float) * TOTAL);
-	quads.root = malloc(sizeof(float) * TOTAL);
+	quads.a = malloc(sizeof(float) * DEFAULT_MAX);
+	quads.b = malloc(sizeof(float) * DEFAULT_MAX);
+	quads.c = malloc(sizeof(float) * DEFAULT_MAX);
+	quads.root = malloc(sizeof(float) * DEFAULT_MAX);
 
 	if (!quads.a || !quads.b || !quads.c || !quads.root) {
 		 perror("memory error\n");
@@ -45,25 +45,19 @@ int main(int argc, char **argv)
 	srand(time(NULL)); // seed the RNG machine
 
 	// set up some trash quadratics
-	for (i = 0; i < TOTAL; i++) {
+	for (i = 0; i < DEFAULT_MAX; i++) {
 		quads.a[i] = rand() % 100 - 50;
 		quads.b[i] = rand() % 100 - 50;
 		quads.c[i] = rand() % 100 - 50;
 	}
 
 	// perform the math
-	for (i = 0; i < TOTAL; i++) {
+	for (i = 0; i < DEFAULT_MAX; i++) {
 		quads.root[i] = 
 			(-quads.b[i] +
 			 sqrt(quads.b[i] * quads.b[i] - (4 * quads.a[i] * quads.c[i])) /
 			 (2 * quads.a[i]));
 	}
-
-	for (i = 0; i < TOTAL; i++) {
-		fprintf(fp, "%6d  %f\n", i, quads.root[i]);
-	}
-
-	fclose(fp);
 
 	free(quads.a);
 	free(quads.b);

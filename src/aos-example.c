@@ -13,7 +13,9 @@
 #include <time.h>
 #include <math.h>
 
-#define TOTAL 1 << 30 /* 2^24 */
+#ifndef DEFAULT_MAX
+#define DEFAULT_MAX 1 << 24
+#endif
 
 struct quad_t {
 	float a, b, c;
@@ -22,37 +24,30 @@ struct quad_t {
 
 int main(int argc, char **argv)
 {
-	FILE *fp;
 	struct quad_t *quads;
 	int i;
 
-	fp = fopen("output_aos.txt", "w");
-	if (!fp) { perror("couldn't open file error\n"); exit(1); }
+	printf("Testing AoS with %ld elements\n", (unsigned long)DEFAULT_MAX);
 
-	quads = malloc(sizeof(struct quad_t) * TOTAL); // get some bytes
+	quads = malloc(sizeof(struct quad_t) * DEFAULT_MAX); // get some bytes
 	if (!quads) { perror("memory error\n"); exit(1); }
 
 	srand(time(NULL)); // seed the RNG machine
 
 	// set up some trash quadratics
-	for (i = 0; i < TOTAL; i++) {
+	for (i = 0; i < DEFAULT_MAX; i++) {
 		quads[i].a = rand() % 100 - 50;
 		quads[i].b = rand() % 100 - 50;
 		quads[i].c = rand() % 100 - 50;
 	}
 
 	// perform the math
-	for (i = 0; i < TOTAL; i++) {
+	for (i = 0; i < DEFAULT_MAX; i++) {
 		quads[i].root =
 			(-quads[i].b + sqrt(quads[i].b * quads[i].b - (4 * quads[i].a * quads[i].c)) /
 			 (2 * quads[i].a));
 	}
 
-	for (i = 0; i < TOTAL; i++) {
-		fprintf(fp, "%6d  %f\n", i, quads[i].root);
-	}
-
-	fclose(fp);
 	free(quads);
 
 	return 0;
