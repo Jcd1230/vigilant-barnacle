@@ -1,0 +1,4 @@
+# ignore the binary
+# no binaries in my sauce
+demo
+*.o
